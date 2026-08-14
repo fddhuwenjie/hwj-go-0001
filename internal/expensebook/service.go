@@ -15,9 +15,17 @@ var ErrHeader = errors.New("invalid CSV header")
 
 func ImportCSV(source io.Reader) ([]Expense, error) {
 	reader := csv.NewReader(source)
-	records, err := reader.ReadAll()
-	if err != nil {
-		return nil, fmt.Errorf("read expenses: %w", err)
+	reader.FieldsPerRecord = -1
+	var records [][]string
+	for {
+		raw, err := reader.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("read expenses: %w", err)
+		}
+		records = append(records, strings.Split(strings.Join(raw, ","), ","))
 	}
 	if len(records) == 0 || len(records[0]) != 4 || strings.Join(records[0], ",") != "date,category,amount,description" {
 		return nil, ErrHeader
