@@ -25,7 +25,7 @@ func ImportCSV(source io.Reader) ([]Expense, error) {
 		if err != nil {
 			return nil, fmt.Errorf("read expenses: %w", err)
 		}
-		records = append(records, strings.Split(strings.Join(raw, ","), ","))
+		records = append(records, raw)
 	}
 	if len(records) == 0 || len(records[0]) != 4 || strings.Join(records[0], ",") != "date,category,amount,description" {
 		return nil, ErrHeader
